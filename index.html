@@ -1,0 +1,234 @@
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yêu em pé nhất, Chúc em pé có 1/6 vui vẻ</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax CDN -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- Math.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+    .youtube-audio {
+      position: absolute;
+      width: 0;
+      height: 0;
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="content flex flex-col items-center justify-center min-h-screen text-center">
+    <!-- Đã xoá carousel ảnh từ Facebook -->
+  </div>
+  <!-- Nhúng video YouTube từ giây 0:42 -->
+  <iframe class="youtube-audio" src="https://www.youtube.com/embed/js6JBdLzNn4?start=42&autoplay=1&mute=0&controls=0&showinfo=0&rel=0&loop=1&playlist=js6JBdLzNn4" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Cài đặt canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Mảng lưu trữ trái tim, ngôi sao và văn bản
+    const hearts = [];
+    const stars = [];
+    const texts = [];
+
+    // Danh sách các câu sến súa
+    const messages = [
+      "Yêu em pé nhất, Chúc em pé có 1/6 vui vẻ 💕",
+      "Anh nguyện làm mặt trời, soi sáng cả thế giới của em 🌞",
+      "Em pé là ngôi sao sáng nhất trong bầu trời của anh ✨",
+      "Tình yêu của anh dành cho em pé là mãi mãi 💖",
+      "Chỉ cần em pé vui, anh nguyện làm tất cả 🌈",
+      "Em pé là cả thế giới trong trái tim anh 💌",
+      "Anh sẽ mãi bên em pé, như ngôi sao không rời bầu trời 🌟",
+      "Yêu em pé hơn cả những vì sao trên trời 💫",
+      "Chúc em pé ngày 1/6 tràn ngập niềm vui và hạnh phúc 🎈"
+    ];
+
+    // Lớp Heart (Trái tim)
+    class Heart {
+      constructor(x, y, size, speed) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.speed = speed;
+        this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+        this.opacity = 1;
+      }
+
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + this.size / 4);
+        ctx.quadraticCurveTo(this.x - this.size / 2, this.y - this.size / 2, this.x - this.size, this.y + this.size / 4);
+        ctx.quadraticCurveTo(this.x - this.size / 2, this.y + this.size, this.x, this.y + 3 * this.size / 4);
+        ctx.quadraticCurveTo(this.x + this.size / 2, this.y + this.size, this.x + this.size, this.y + this.size / 4);
+        ctx.quadraticCurveTo(this.x + this.size / 2, this.y - this.size / 2, this.x, this.y + this.size / 4);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      update() {
+        this.y -= this.speed;
+        this.opacity -= 0.005;
+        if (this.opacity <= 0) return false;
+        return true;
+      }
+    }
+
+    // Lớp Star (Ngôi sao lấp lánh)
+    class Star {
+      constructor(x, y, size) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.opacity = Math.random();
+        this.deltaOpacity = Math.random() * 0.05;
+      }
+
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+          const outerX = this.x + Math.cos(angle) * this.size;
+          const outerY = this.y + Math.sin(angle) * this.size;
+          const innerAngle = angle + (Math.PI * 2 / 10);
+          const innerX = this.x + Math.cos(innerAngle) * (this.size / 2);
+          const innerY = this.y + Math.sin(innerAngle) * (this.size / 2);
+          if (i === 0) ctx.moveTo(outerX, outerY);
+          else ctx.lineTo(outerX, outerY);
+          ctx.lineTo(innerX, innerY);
+        }
+        ctx.closePath();
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      update() {
+        this.opacity += this.deltaOpacity;
+        if (this.opacity >= 1 || this.opacity <= 0) this.deltaOpacity *= -1;
+      }
+    }
+
+    // Lớp Text (Văn bản nổi lên)
+    class Text {
+      constructor(x, y, message, speed) {
+        this.x = x;
+        this.y = y;
+        this.message = message;
+        this.speed = speed;
+        this.opacity = 1;
+        this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      }
+
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = this.color;
+        ctx.textAlign = 'center';
+        ctx.fillText(this.message, this.x, this.y);
+        ctx.globalAlpha = 1;
+      }
+
+      update() {
+        this.y -= this.speed;
+        this.opacity -= 0.005;
+        if (this.opacity <= 0) return false;
+        return true;
+      }
+    }
+
+    // Tạo trái tim mới
+    function spawnHeart() {
+      const x = Math.random() * canvas.width;
+      const y = canvas.height;
+      const size = Math.random() * 20 + 10;
+      const speed = Math.random() * 2 + 1;
+      hearts.push(new Heart(x, y, size, speed));
+    }
+
+    // Tạo ngôi sao lấp lánh
+    function spawnStar() {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      const size = Math.random() * 5 + 2;
+      stars.push(new Star(x, y, size));
+    }
+
+    // Tạo văn bản mới
+    function spawnText() {
+      const x = Math.random() * canvas.width;
+      const y = canvas.height;
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      const speed = Math.random() * 1.5 + 0.5;
+      texts.push(new Text(x, y, message, speed));
+    }
+
+    // Khởi tạo các ngôi sao
+    for (let i = 0; i < 50; i++) spawnStar();
+
+    // Vòng lặp animation
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Tạo trái tim và văn bản mới
+      if (Math.random() < 0.1) spawnHeart();
+      if (Math.random() < 0.05) spawnText();
+
+      // Cập nhật và vẽ trái tim
+      for (let i = hearts.length - 1; i >= 0; i--) {
+        hearts[i].draw();
+        if (!hearts[i].update()) hearts.splice(i, 1);
+      }
+
+      // Cập nhật và vẽ ngôi sao
+      stars.forEach(star => {
+        star.draw();
+        star.update();
+      });
+
+      // Cập nhật và vẽ văn bản
+      for (let i = texts.length - 1; i >= 0; i--) {
+        texts[i].draw();
+        if (!texts[i].update()) texts.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // Xử lý resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
